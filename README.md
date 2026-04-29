@@ -41,20 +41,6 @@ A professional single-page scrolling website for **Purple Poet Promotions**, an 
 
 ---
 
-## 📁 File Structure
-
-```
-index.html              ← Main single-page site
-css/
-  └── style.css         ← Full stylesheet (brand colors, responsive)
-js/
-  └── main.js           ← All JS: nav, particles, tabs, gallery, forms
-images/
-  └── logo.png          ← AI-generated P3 logo
-README.md
-```
-
----
 
 ## 🔗 Functional Entry Points
 
