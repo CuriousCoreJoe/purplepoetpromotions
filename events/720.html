@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>720 Event | Purple Poet Promotions</title>
+  <meta name="description" content="Join us for the 720 event on July 20th." />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+
+  <!-- Link css relative to events folder -->
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../event-page.css" />
+</head>
+<body>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo">
+        <span class="nav-logo-text">Purple Poet Promotions</span>
+      </a>
+      <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#home" class="nav-link">Home</a></li>
+        <li><a href="../index.html#about" class="nav-link">About</a></li>
+        <li><a href="../index.html#events" class="nav-link">Events</a></li>
+        <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
+        <li><a href="../index.html#contact" class="nav-cta-btn">Book Now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ===================== EVENT HERO ===================== -->
+  <header class="event-hero">
+    <div class="event-hero-bg">
+      <img src="../images/events/720-hero-placeholder.jpg" alt="720 Event" />
+      <div class="img-overlay"></div>
+    </div>
+    <div class="container event-hero-content">
+      <a href="../index.html#events" class="back-link"><i class="fas fa-arrow-left"></i> Back to Events</a>
+      <div class="event-hero-grid">
+        <div class="event-hero-text">
+          <div class="event-date-pill">
+            <i class="fas fa-calendar"></i> July 20
+          </div>
+          <h1>720</h1>
+          <p class="event-subtitle">An unforgettable experience.</p>
+          <div class="event-meta-list">
+            <div class="meta-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <div>
+                <strong>Venue TBA</strong>
+                <span>[Area]</span>
+              </div>
+            </div>
+            <div class="meta-item">
+              <i class="fas fa-clock"></i>
+              <div>
+                <strong>Time</strong>
+                <span>[Time]</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="event-hero-poster">
+          <!-- Backend hook: Replace image src here when uploading flyer -->
+          <img src="../images/events/720-flyer-placeholder.jpg" alt="720 Event Flyer" />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== PHOTO GALLERY ===================== -->
+  <section class="event-photo-gallery" style="padding-top: 0;">
+    <div class="container">
+      <h2>Event Gallery</h2>
+      <div class="single-event-carousel-wrap">
+        <div class="single-event-carousel" id="single-event-carousel">
+          <div class="carousel-slide active-slide">
+            <div class="gallery-placeholder"><i class="fas fa-camera"></i><span>Event Photo 1</span></div>
+          </div>
+          <div class="carousel-slide">
+            <div class="gallery-placeholder"><i class="fas fa-camera"></i><span>Event Photo 2</span></div>
+          </div>
+          <div class="carousel-slide">
+            <div class="gallery-placeholder"><i class="fas fa-camera"></i><span>Event Photo 3</span></div>
+          </div>
+        </div>
+        <button class="carousel-nav prev" id="single-prev"><i class="fas fa-chevron-left"></i></button>
+        <button class="carousel-nav next" id="single-next"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== EVENT DETAILS ===================== -->
+  <section class="section event-details-section">
+    <div class="container">
+      <div class="event-details-grid">
+        <div class="event-main-content">
+          <h2>About The Event</h2>
+          <p>We are thrilled to bring you our upcoming event: 720. Stay tuned as we announce more details, the venue, and the exciting lineup we have prepared for you!</p>
+          
+          <h3 class="mt-4">Featuring Artists</h3>
+          <p>Lineup to be announced.</p>
+          <ul class="artist-list">
+            <li><i class="fas fa-microphone"></i> [Artist Name]</li>
+            <li><i class="fas fa-microphone"></i> [Artist Name]</li>
+          </ul>
+
+        </div>
+
+        <div class="event-sidebar">
+          <div class="ticket-card">
+            <h3>Get Your Tickets</h3>
+            <p>Don't miss out on this spectacular event.</p>
+            <div class="ticket-price">
+              <span>More Info Coming Soon</span>
+            </div>
+            <a href="https://www.eventbrite.com" target="_blank" class="btn btn-purple btn-full">
+              <i class="fas fa-ticket-alt"></i> Get Tickets
+            </a>
+            <p class="ticket-note">Tickets sold via Eventbrite.</p>
+          </div>
+          <div class="share-card">
+            <h3>Share Event</h3>
+            <div class="share-btns">
+              <button class="share-btn fb" aria-label="Share on Facebook"><i class="fab fa-facebook-f"></i></button>
+              <button class="share-btn tw" aria-label="Share on Twitter"><i class="fab fa-twitter"></i></button>
+              <button class="share-btn link" aria-label="Copy Link"><i class="fas fa-link"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <img src="../images/logo-full.png" alt="Purple Poet Promotions" class="footer-logo" />
+            <p class="footer-tagline">"Bringing beautiful noise and people together in beautiful spaces for entertainment."</p>
+            <div class="footer-socials">
+              <a href="https://www.facebook.com/purple.poet.promotions" target="_blank" aria-label="Facebook">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="https://www.youtube.com/@purplepoet-p3" target="_blank" aria-label="YouTube">
+                <i class="fab fa-youtube"></i>
+              </a>
+            </div>
+          </div>
+          <div class="footer-nav">
+            <h4>Quick Links</h4>
+            <ul>
+              <li><a href="../index.html#home">Home</a></li>
+              <li><a href="../index.html#about">About P3</a></li>
+              <li><a href="../index.html#services">Services</a></li>
+              <li><a href="../index.html#events">Events</a></li>
+              <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-nav">
+            <h4>For Artists</h4>
+            <ul>
+              <li><a href="../index.html#artist-form">Get Booked</a></li>
+              <li><a href="../index.html#events">Upcoming Shows</a></li>
+              <li><a href="https://www.facebook.com/purple.poet.promotions" target="_blank">Follow for Casting Calls</a></li>
+            </ul>
+          </div>
+          <div class="footer-contact">
+            <h4>Contact</h4>
+            <p><i class="fas fa-envelope"></i> <a href="mailto:info@purplepoetpromotions.com">info@purplepoetpromotions.com</a></p>
+            <p><i class="fab fa-facebook"></i> <a href="https://www.facebook.com/purple.poet.promotions" target="_blank">@purple.poet.promotions</a></p>
+            <p><i class="fab fa-youtube"></i> <a href="https://www.youtube.com/@purplepoet-p3" target="_blank">YouTube Channel</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>&copy; <span id="year"></span> Purple Poet Promotions. All rights reserved.</p>
+        <p class="footer-credit">Curating Unforgettable Entertainment Experiences.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Lightbox Modal -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()"><i class="fas fa-times"></i></button>
+    <div class="lightbox-content" id="lightbox-content"></div>
+  </div>
+
+  <script src="../main.js"></script>
+</body>
+</html>
