@@ -293,11 +293,28 @@ function validateForm(form) {
   return valid;
 }
 
-// Live validation clearing
+// Phone Number Formatting (US format: (XXX) XXX-XXXX)
+function formatPhoneNumber(value) {
+  if (!value) return value;
+  const phoneNumber = value.replace(/[^\d]/g, '');
+  const phoneNumberLength = phoneNumber.length;
+  if (phoneNumberLength < 4) return phoneNumber;
+  if (phoneNumberLength < 7) {
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+  }
+  return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+}
+
+// Live validation clearing & input formatting
 document.querySelectorAll('input, select, textarea').forEach(field => {
-  field.addEventListener('input', () => {
+  field.addEventListener('input', (e) => {
     if (field.classList.contains('error')) {
       clearFieldError(field);
+    }
+
+    if (field.type === 'tel') {
+      const formattedNumber = formatPhoneNumber(field.value);
+      field.value = formattedNumber;
     }
   });
 });
