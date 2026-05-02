@@ -329,10 +329,15 @@ artistForm.addEventListener('submit', async (e) => {
   };
 
   try {
-    const response = await fetch('tables/artist_inquiries', {
+    const formData = new FormData();
+    formData.append('form_type', 'artist_inquiry');
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+
+    const response = await fetch('submit_form.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: formData
     });
 
     if (!response.ok) throw new Error('Submission failed');
@@ -376,10 +381,17 @@ venueForm.addEventListener('submit', async (e) => {
   };
 
   try {
-    const response = await fetch('tables/venue_inquiries', {
+    const formData = new FormData();
+    formData.append('form_type', 'venue_inquiry');
+    // Ensure all venue data is added
+    data.budget = venueForm.querySelector('[name="budget"]').value.trim(); // Add budget which was missing from JS data obj before
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+
+    const response = await fetch('submit_form.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: formData
     });
 
     if (!response.ok) throw new Error('Submission failed');
