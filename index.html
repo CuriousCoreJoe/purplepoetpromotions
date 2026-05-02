@@ -332,7 +332,8 @@
               <p>Ready to be heard? Submit your info below.</p>
             </div>
           </div>
-          <form class="inquiry-form" id="artist-inquiry-form" novalidate>
+          <form class="inquiry-form" id="artist-inquiry-form" action="submit_form.php" method="POST">
+            <input type="hidden" name="form_type" value="artist_inquiry">
             <div class="form-row">
               <div class="form-group">
                 <label for="artist-name">Full Name <span class="required">*</span></label>
@@ -399,7 +400,8 @@
               <p>Let's bring the beautiful noise to your space.</p>
             </div>
           </div>
-          <form class="inquiry-form" id="venue-inquiry-form" novalidate>
+          <form class="inquiry-form" id="venue-inquiry-form" action="submit_form.php" method="POST">
+            <input type="hidden" name="form_type" value="venue_inquiry">
             <div class="form-row">
               <div class="form-group">
                 <label for="venue-name">Contact Name <span class="required">*</span></label>
