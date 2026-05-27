@@ -333,6 +333,7 @@
             </div>
           </div>
           <form class="inquiry-form" id="artist-inquiry-form" action="submit_form.php" method="POST">
+            <input type="hidden" name="recaptcha_token" id="artist-recaptcha-token" value="">
             <input type="hidden" name="form_type" value="artist_inquiry">
             <div class="form-row">
               <div class="form-group">
@@ -400,7 +401,8 @@
               <p>Let's bring the beautiful noise to your space.</p>
             </div>
           </div>
-          <form class="inquiry-form" id="venue-inquiry-form" action="submit_form.php" method="POST">
+            <form class="inquiry-form" id="venue-inquiry-form" action="submit_form.php" method="POST">
+            <input type="hidden" name="recaptcha_token" id="venue-recaptcha-token" value="">
             <input type="hidden" name="form_type" value="venue_inquiry">
             <div class="form-row">
               <div class="form-group">
@@ -515,6 +517,7 @@
   <!-- Toast Notification -->
   <div class="toast" id="toast"></div>
 
-  <script src="main.js?v=2"></script>
+  <script src="https://www.google.com/recaptcha/api.js?render=6Lf_qf4sAAAAACsxedI6Yk2Tmvyid5maVx1FNDZt" async defer></script>
+  <script src="main.js?v=3"></script>
 </body>
 </html>

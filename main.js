@@ -254,7 +254,18 @@ function showToast(message, type = 'success') {
 
 // ===== FORM VALIDATION =====
 function validateEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  // RFC 5322 compliant email validation with additional checks
+  if (!email || typeof email !== 'string') return false;
+  const trimmed = email.trim();
+  if (trimmed.length > 254) return false; // RFC 5321 max length
+  // Standard email format + reject common disposable patterns
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(trimmed)) return false;
+  // Reject obviously fake/temporary domains
+  const blockedDomains = ['example.com', 'test.com', 'mailinator.com', 'guerrillamail.com', '10minutemail.com', 'tempmail.com', 'throwaway.email', 'yopmail.com', 'sharklasers.com', 'trashmail.com'];
+  const domain = trimmed.split('@')[1]?.toLowerCase();
+  if (!domain || blockedDomains.includes(domain)) return false;
+  return true;
 }
 
 function setFieldError(input, message) {
@@ -319,6 +330,28 @@ document.querySelectorAll('input, select, textarea').forEach(field => {
   });
 });
 
+// ===== reCAPTCHA CONFIGURATION =====
+// Replace this with your actual reCAPTCHA v3 site key from https://www.google.com/recaptcha/admin
+const RECAPTCHA_SITE_KEY = '6Lf_qf4sAAAAACsxedI6Yk2Tmvyid5maVx1FNDZt';
+
+async function getRecaptchaToken(action) {
+  return new Promise((resolve, reject) => {
+    if (typeof grecaptcha === 'undefined' || !grecaptcha.execute) {
+      console.warn('reCAPTCHA not loaded — proceeding without token');
+      resolve('');
+      return;
+    }
+    grecaptcha.ready(() => {
+      grecaptcha.execute(RECAPTCHA_SITE_KEY, { action })
+        .then(token => resolve(token))
+        .catch(err => {
+          console.error('reCAPTCHA error:', err);
+          resolve(''); // Fallback: proceed without token
+        });
+    });
+  });
+}
+
 // ===== ARTIST INQUIRY FORM =====
 const artistForm = document.getElementById('artist-inquiry-form');
 const artistSubmit = document.getElementById('artist-submit');
@@ -346,8 +379,13 @@ artistForm.addEventListener('submit', async (e) => {
   };
 
   try {
+    // Generate reCAPTCHA token
+    const token = await getRecaptchaToken('artist_form_submit');
+    document.getElementById('artist-recaptcha-token').value = token;
+
     const formData = new FormData();
     formData.append('form_type', 'artist_inquiry');
+    formData.append('recaptcha_token', token);
     for (const key in data) {
       formData.append(key, data[key]);
     }
@@ -357,7 +395,11 @@ artistForm.addEventListener('submit', async (e) => {
       body: formData
     });
 
-    if (!response.ok) throw new Error('Submission failed');
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || 'Submission failed');
+    }
 
     artistForm.style.display = 'none';
     artistSuccess.classList.add('show');
@@ -394,14 +436,18 @@ venueForm.addEventListener('submit', async (e) => {
     venue_name: venueForm.querySelector('[name="venue_name"]').value.trim(),
     event_date: venueForm.querySelector('[name="event_date"]').value.trim(),
     event_details: venueForm.querySelector('[name="event_details"]').value.trim(),
+    budget: venueForm.querySelector('[name="budget"]').value.trim(),
     status: 'New'
   };
 
   try {
+    // Generate reCAPTCHA token
+    const token = await getRecaptchaToken('venue_form_submit');
+    document.getElementById('venue-recaptcha-token').value = token;
+
     const formData = new FormData();
     formData.append('form_type', 'venue_inquiry');
-    // Ensure all venue data is added
-    data.budget = venueForm.querySelector('[name="budget"]').value.trim(); // Add budget which was missing from JS data obj before
+    formData.append('recaptcha_token', token);
     for (const key in data) {
       formData.append(key, data[key]);
     }
@@ -411,7 +457,11 @@ venueForm.addEventListener('submit', async (e) => {
       body: formData
     });
 
-    if (!response.ok) throw new Error('Submission failed');
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || 'Submission failed');
+    }
 
     venueForm.style.display = 'none';
     venueSuccess.classList.add('show');
