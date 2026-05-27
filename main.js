@@ -304,6 +304,227 @@ function validateForm(form) {
   return valid;
 }
 
+// ===== reCAPTCHA v2 CHECKBOX VALIDATION =====
+
+/**
+ * Checks if the reCAPTCHA checkbox has been completed for a given widget ID
+ * Returns the g-recaptcha-response token if verified, or null if not
+ */
+function getRecaptchaResponse(widgetId) {
+  if (typeof grecaptcha === 'undefined' || !grecaptcha.getResponse) {
+    console.warn('reCAPTCHA not loaded');
+    return null;
+  }
+  const response = grecaptcha.getResponse(widgetId);
+  return response || null;
+}
+
+/**
+ * Displays an error on the reCAPTCHA widget wrapper
+ */
+function showCaptchaError(formEl, errorId) {
+  const errorEl = document.getElementById(errorId);
+  if (errorEl) {
+    errorEl.textContent = 'Please verify you are not a robot.';
+  }
+  // Add error styling to the reCAPTCHA wrapper
+  const wrap = formEl.querySelector('.recaptcha-wrap');
+  if (wrap) {
+    wrap.classList.add('captcha-error');
+  }
+}
+
+/**
+ * Clears the reCAPTCHA error for a form
+ */
+function clearCaptchaError(formEl, errorId) {
+  const errorEl = document.getElementById(errorId);
+  if (errorEl) {
+    errorEl.textContent = '';
+  }
+  const wrap = formEl.querySelector('.recaptcha-wrap');
+  if (wrap) {
+    wrap.classList.remove('captcha-error');
+  }
+}
+
+// We'll store widget IDs once reCAPTCHA renders them
+let artistWidgetId = null;
+let venueWidgetId = null;
+
+// Callback when reCAPTCHA loads — capture widget IDs
+window.onRecaptchaLoad = function () {
+  if (typeof grecaptcha !== 'undefined' && grecaptcha.render) {
+    // The widgets auto-render via g-recaptcha class, get their IDs
+    // We need to wait a tick for them to be rendered
+    setTimeout(() => {
+      // Find all rendered widgets and match by container
+      const artistEl = document.getElementById('artist-recaptcha');
+      const venueEl = document.getElementById('venue-recaptcha');
+      if (artistEl && artistEl.firstChild) {
+        artistWidgetId = 0; // First widget gets ID 0
+      }
+      if (venueEl && venueEl.firstChild) {
+        venueWidgetId = 1; // Second widget gets ID 1
+      }
+    }, 500);
+  }
+};
+
+// Also capture on explicit render callback
+window.recaptchaCallback = function (response) {
+  // Clear error when user checks the box
+  // Determine which widget triggered this by checking response
+  
+};
+
+// ===== ARTIST INQUIRY FORM =====
+const artistForm = document.getElementById('artist-inquiry-form');
+const artistSubmit = document.getElementById('artist-submit');
+const artistSuccess = document.getElementById('artist-success');
+
+artistForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  // Clear any previous captcha error
+  clearCaptchaError(artistForm, 'artist-captcha-error');
+
+  if (!validateForm(artistForm)) {
+    showToast('Please fill in all required fields.', 'error');
+    return;
+  }
+
+  // Verify reCAPTCHA checkbox
+  const captchaResponse = getRecaptchaResponse(artistWidgetId);
+  if (!captchaResponse) {
+    showCaptchaError(artistForm, 'artist-captcha-error');
+    showToast('Please verify you are not a robot by checking the reCAPTCHA box.', 'error');
+    return;
+  }
+
+  artistSubmit.classList.add('loading');
+  artistSubmit.disabled = true;
+
+  const data = {
+    name: artistForm.querySelector('[name="name"]').value.trim(),
+    email: artistForm.querySelector('[name="email"]').value.trim(),
+    phone: artistForm.querySelector('[name="phone"]').value.trim(),
+    talent_type: artistForm.querySelector('[name="talent_type"]').value,
+    epk_links: artistForm.querySelector('[name="epk_links"]').value.trim(),
+    message: artistForm.querySelector('[name="message"]').value.trim(),
+    status: 'New'
+  };
+
+  try {
+    const formData = new FormData();
+    formData.append('form_type', 'artist_inquiry');
+    formData.append('g-recaptcha-response', captchaResponse);
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+
+    const response = await fetch('submit_form.php', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      // If CAPTCHA failed server-side, reset the widget
+      if (result.message && result.message.toLowerCase().includes('captcha')) {
+        grecaptcha.reset(artistWidgetId);
+        showCaptchaError(artistForm, 'artist-captcha-error');
+      }
+      throw new Error(result.message || 'Submission failed');
+    }
+
+    artistForm.style.display = 'none';
+    artistSuccess.classList.add('show');
+    showToast('Artist inquiry submitted! We\'ll be in touch. 🎤');
+
+  } catch (err) {
+    console.error('Artist form error:', err);
+    showToast(err.message || 'Something went wrong. Please try again or reach us on Facebook.', 'error');
+    artistSubmit.classList.remove('loading');
+    artistSubmit.disabled = false;
+  }
+});
+
+// ===== VENUE INQUIRY FORM =====
+const venueForm = document.getElementById('venue-inquiry-form');
+const venueSubmit = document.getElementById('venue-submit');
+const venueSuccess = document.getElementById('venue-success');
+
+venueForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  // Clear any previous captcha error
+  clearCaptchaError(venueForm, 'venue-captcha-error');
+
+  if (!validateForm(venueForm)) {
+    showToast('Please fill in all required fields.', 'error');
+    return;
+  }
+
+  // Verify reCAPTCHA checkbox
+  const captchaResponse = getRecaptchaResponse(venueWidgetId);
+  if (!captchaResponse) {
+    showCaptchaError(venueForm, 'venue-captcha-error');
+    showToast('Please verify you are not a robot by checking the reCAPTCHA box.', 'error');
+    return;
+  }
+
+  venueSubmit.classList.add('loading');
+  venueSubmit.disabled = true;
+
+  const data = {
+    name: venueForm.querySelector('[name="name"]').value.trim(),
+    email: venueForm.querySelector('[name="email"]').value.trim(),
+    phone: venueForm.querySelector('[name="phone"]').value.trim(),
+    venue_name: venueForm.querySelector('[name="venue_name"]').value.trim(),
+    event_date: venueForm.querySelector('[name="event_date"]').value.trim(),
+    event_details: venueForm.querySelector('[name="event_details"]').value.trim(),
+    budget: venueForm.querySelector('[name="budget"]').value.trim(),
+    status: 'New'
+  };
+
+  try {
+    const formData = new FormData();
+    formData.append('form_type', 'venue_inquiry');
+    formData.append('g-recaptcha-response', captchaResponse);
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+
+    const response = await fetch('submit_form.php', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      // If CAPTCHA failed server-side, reset the widget
+      if (result.message && result.message.toLowerCase().includes('captcha')) {
+        grecaptcha.reset(venueWidgetId);
+        showCaptchaError(venueForm, 'venue-captcha-error');
+      }
+      throw new Error(result.message || 'Submission failed');
+    }
+
+    venueForm.style.display = 'none';
+    venueSuccess.classList.add('show');
+    showToast('Venue inquiry submitted! Let\'s make it happen! 🎉');
+
+  } catch (err) {
+    console.error('Venue form error:', err);
+    showToast(err.message || 'Something went wrong. Please try again or reach us on Facebook.', 'error');
+    venueSubmit.classList.remove('loading');
+    venueSubmit.disabled = false;
+  }
+});
+
 // Phone Number Formatting (US format: (XXX) XXX-XXXX)
 function formatPhoneNumber(value) {
   if (!value) return value;
@@ -328,151 +549,6 @@ document.querySelectorAll('input, select, textarea').forEach(field => {
       field.value = formattedNumber;
     }
   });
-});
-
-// ===== reCAPTCHA CONFIGURATION =====
-// Replace this with your actual reCAPTCHA v3 site key from https://www.google.com/recaptcha/admin
-const RECAPTCHA_SITE_KEY = '6Lf_qf4sAAAAACsxedI6Yk2Tmvyid5maVx1FNDZt';
-
-async function getRecaptchaToken(action) {
-  return new Promise((resolve, reject) => {
-    if (typeof grecaptcha === 'undefined' || !grecaptcha.execute) {
-      console.warn('reCAPTCHA not loaded — proceeding without token');
-      resolve('');
-      return;
-    }
-    grecaptcha.ready(() => {
-      grecaptcha.execute(RECAPTCHA_SITE_KEY, { action })
-        .then(token => resolve(token))
-        .catch(err => {
-          console.error('reCAPTCHA error:', err);
-          resolve(''); // Fallback: proceed without token
-        });
-    });
-  });
-}
-
-// ===== ARTIST INQUIRY FORM =====
-const artistForm = document.getElementById('artist-inquiry-form');
-const artistSubmit = document.getElementById('artist-submit');
-const artistSuccess = document.getElementById('artist-success');
-
-artistForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  if (!validateForm(artistForm)) {
-    showToast('Please fill in all required fields.', 'error');
-    return;
-  }
-
-  artistSubmit.classList.add('loading');
-  artistSubmit.disabled = true;
-
-  const data = {
-    name: artistForm.querySelector('[name="name"]').value.trim(),
-    email: artistForm.querySelector('[name="email"]').value.trim(),
-    phone: artistForm.querySelector('[name="phone"]').value.trim(),
-    talent_type: artistForm.querySelector('[name="talent_type"]').value,
-    epk_links: artistForm.querySelector('[name="epk_links"]').value.trim(),
-    message: artistForm.querySelector('[name="message"]').value.trim(),
-    status: 'New'
-  };
-
-  try {
-    // Generate reCAPTCHA token
-    const token = await getRecaptchaToken('artist_form_submit');
-    document.getElementById('artist-recaptcha-token').value = token;
-
-    const formData = new FormData();
-    formData.append('form_type', 'artist_inquiry');
-    formData.append('recaptcha_token', token);
-    for (const key in data) {
-      formData.append(key, data[key]);
-    }
-
-    const response = await fetch('submit_form.php', {
-      method: 'POST',
-      body: formData
-    });
-
-    const result = await response.json();
-
-    if (!response.ok || !result.success) {
-      throw new Error(result.message || 'Submission failed');
-    }
-
-    artistForm.style.display = 'none';
-    artistSuccess.classList.add('show');
-    showToast('Artist inquiry submitted! We\'ll be in touch. 🎤');
-
-  } catch (err) {
-    console.error('Artist form error:', err);
-    showToast('Something went wrong. Please try again or reach us on Facebook.', 'error');
-    artistSubmit.classList.remove('loading');
-    artistSubmit.disabled = false;
-  }
-});
-
-// ===== VENUE INQUIRY FORM =====
-const venueForm = document.getElementById('venue-inquiry-form');
-const venueSubmit = document.getElementById('venue-submit');
-const venueSuccess = document.getElementById('venue-success');
-
-venueForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  if (!validateForm(venueForm)) {
-    showToast('Please fill in all required fields.', 'error');
-    return;
-  }
-
-  venueSubmit.classList.add('loading');
-  venueSubmit.disabled = true;
-
-  const data = {
-    name: venueForm.querySelector('[name="name"]').value.trim(),
-    email: venueForm.querySelector('[name="email"]').value.trim(),
-    phone: venueForm.querySelector('[name="phone"]').value.trim(),
-    venue_name: venueForm.querySelector('[name="venue_name"]').value.trim(),
-    event_date: venueForm.querySelector('[name="event_date"]').value.trim(),
-    event_details: venueForm.querySelector('[name="event_details"]').value.trim(),
-    budget: venueForm.querySelector('[name="budget"]').value.trim(),
-    status: 'New'
-  };
-
-  try {
-    // Generate reCAPTCHA token
-    const token = await getRecaptchaToken('venue_form_submit');
-    document.getElementById('venue-recaptcha-token').value = token;
-
-    const formData = new FormData();
-    formData.append('form_type', 'venue_inquiry');
-    formData.append('recaptcha_token', token);
-    for (const key in data) {
-      formData.append(key, data[key]);
-    }
-
-    const response = await fetch('submit_form.php', {
-      method: 'POST',
-      body: formData
-    });
-
-    const result = await response.json();
-
-    if (!response.ok || !result.success) {
-      throw new Error(result.message || 'Submission failed');
-    }
-
-    venueForm.style.display = 'none';
-    venueSuccess.classList.add('show');
-    showToast('Venue inquiry submitted! Let\'s make it happen! 🎉');
-
-  } catch (err) {
-    console.error('Venue form error:', err);
-    showToast('Something went wrong. Please try again or reach us on Facebook.', 'error');
-    venueSubmit.classList.remove('loading');
-    venueSubmit.disabled = false;
-  }
 });
 
 // ===== FOOTER YEAR =====

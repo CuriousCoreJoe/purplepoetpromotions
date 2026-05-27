@@ -333,7 +333,6 @@
             </div>
           </div>
           <form class="inquiry-form" id="artist-inquiry-form" action="submit_form.php" method="POST">
-            <input type="hidden" name="recaptcha_token" id="artist-recaptcha-token" value="">
             <input type="hidden" name="form_type" value="artist_inquiry">
             <div class="form-row">
               <div class="form-group">
@@ -378,6 +377,10 @@
               <label for="artist-message">Additional Info</label>
               <textarea id="artist-message" name="message" rows="3" placeholder="Tell us about your experience, upcoming projects, or anything else we should know..."></textarea>
             </div>
+            <div class="form-group full-width recaptcha-wrap">
+              <div class="g-recaptcha" data-sitekey="6Lf_qf4sAAAAACsxedI6Yk2Tmvyid5maVx1FNDZt" id="artist-recaptcha"></div>
+              <span class="field-error" id="artist-captcha-error"></span>
+            </div>
             <button type="submit" class="btn btn-purple form-submit" id="artist-submit">
               <span class="btn-text"><i class="fas fa-paper-plane"></i> Submit Artist Inquiry</span>
               <span class="btn-loading"><i class="fas fa-spinner fa-spin"></i> Sending...</span>
@@ -402,7 +405,6 @@
             </div>
           </div>
             <form class="inquiry-form" id="venue-inquiry-form" action="submit_form.php" method="POST">
-            <input type="hidden" name="recaptcha_token" id="venue-recaptcha-token" value="">
             <input type="hidden" name="form_type" value="venue_inquiry">
             <div class="form-row">
               <div class="form-group">
@@ -439,6 +441,10 @@
             <div class="form-group full-width">
               <label for="venue-budget">Budget</label>
               <input type="text" id="venue-budget" name="budget" placeholder="e.g., $500 - $1,000 or Flexible" />
+            </div>
+            <div class="form-group full-width recaptcha-wrap">
+              <div class="g-recaptcha" data-sitekey="6Lf_qf4sAAAAACsxedI6Yk2Tmvyid5maVx1FNDZt" id="venue-recaptcha"></div>
+              <span class="field-error" id="venue-captcha-error"></span>
             </div>
             <button type="submit" class="btn btn-gold form-submit" id="venue-submit">
               <span class="btn-text"><i class="fas fa-paper-plane"></i> Submit Venue Inquiry</span>
@@ -517,7 +523,7 @@
   <!-- Toast Notification -->
   <div class="toast" id="toast"></div>
 
-  <script src="https://www.google.com/recaptcha/api.js?render=6Lf_qf4sAAAAACsxedI6Yk2Tmvyid5maVx1FNDZt" async defer></script>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <script src="main.js?v=3"></script>
 </body>
 </html>

@@ -1,10 +1,9 @@
 <?php
 // submit_form.php
 
-// 1. reCAPTCHA Configuration
-// Replace with your actual keys from https://www.google.com/recaptcha/admin
-$recaptcha_secret = '6Lf_qf4sAAAAAGRMVs94grEXO4zjIzbE8om2A0FG';
-$recaptcha_score_threshold = 0.5; // Scores above this are considered human (0.0 = bot, 1.0 = human)
+// 1. reCAPTCHA v2 Configuration
+// Replace with your actual v2 secret key from https://www.google.com/recaptcha/admin
+$recaptcha_secret = 'YOUR_RECAPTCHA_SECRET_KEY';
 
 // 2. Database Configuration
 // Update these values with your actual cPanel MySQL database credentials
@@ -46,7 +45,7 @@ function is_valid_email($email) {
     // PHP built-in filter
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return false;
     
-    // Check domain has valid MX record or at least an A record
+    // Check domain is valid
     $domain = substr(strrchr($email, '@'), 1);
     if (!$domain) return false;
     
@@ -63,31 +62,31 @@ function is_valid_email($email) {
 }
 
 /**
- * Verify reCAPTCHA v3 token with Google's API
- * Returns true if human, false if likely bot or verification failed
+ * Verify reCAPTCHA v2 checkbox token with Google's API
+ * Returns true if human, false if bot or verification failed
  */
-function verify_recaptcha($token, $secret, $threshold) {
+function verify_recaptcha($token, $secret) {
     if (empty($token)) {
-        error_log('reCAPTCHA: No token provided');
+        error_log('reCAPTCHA v2: No token provided');
         return false;
     }
     
     if ($secret === 'YOUR_RECAPTCHA_SECRET_KEY') {
         // reCAPTCHA not configured yet — log warning and allow through
-        error_log('reCAPTCHA: Secret key not configured — allowing submission (DEV MODE)');
+        error_log('reCAPTCHA v2: Secret key not configured — allowing submission (DEV MODE)');
         return true;
     }
     
     $url = 'https://www.google.com/recaptcha/api/siteverify';
     $data = [
-        'secret' => $secret,
+        'secret'   => $secret,
         'response' => $token
     ];
     
     $options = [
         'http' => [
-            'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-            'method' => 'POST',
+            'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+            'method'  => 'POST',
             'content' => http_build_query($data),
             'timeout' => 10
         ]
@@ -97,31 +96,24 @@ function verify_recaptcha($token, $secret, $threshold) {
     $result = @file_get_contents($url, false, $context);
     
     if ($result === false) {
-        error_log('reCAPTCHA: Failed to reach Google API');
+        error_log('reCAPTCHA v2: Failed to reach Google API');
         return false;
     }
     
     $response = json_decode($result, true);
     
     if (!$response || !isset($response['success'])) {
-        error_log('reCAPTCHA: Invalid response from Google');
+        error_log('reCAPTCHA v2: Invalid response from Google');
         return false;
     }
     
     if (!$response['success']) {
         $error_codes = isset($response['error-codes']) ? implode(', ', $response['error-codes']) : 'unknown';
-        error_log("reCAPTCHA: Verification failed — error codes: $error_codes");
+        error_log("reCAPTCHA v2: Verification failed — error codes: $error_codes");
         return false;
     }
     
-    $score = isset($response['score']) ? (float)$response['score'] : 0;
-    error_log("reCAPTCHA: Score = $score (threshold = $threshold)");
-    
-    if ($score < $threshold) {
-        error_log("reCAPTCHA: Score below threshold — likely bot (score: $score)");
-        return false;
-    }
-    
+    error_log('reCAPTCHA v2: Human verified successfully');
     return true;
 }
 
@@ -143,10 +135,10 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     json_response(false, 'Invalid request method.', 405);
 }
 
-// 5. Verify reCAPTCHA token
-$recaptcha_token = $_POST['recaptcha_token'] ?? '';
-if (!verify_recaptcha($recaptcha_token, $recaptcha_secret, $recaptcha_score_threshold)) {
-    json_response(false, 'reCAPTCHA verification failed. If you are human, please try again. If the problem persists, contact us directly via email or Facebook.', 400);
+// 5. Verify reCAPTCHA v2 token
+$recaptcha_token = $_POST['g-recaptcha-response'] ?? '';
+if (!verify_recaptcha($recaptcha_token, $recaptcha_secret)) {
+    json_response(false, 'CAPTCHA verification failed. Please check the "I\'m not a robot" box and try again.', 400);
 }
 
 // 6. Establish PDO Connection
